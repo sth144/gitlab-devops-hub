@@ -34,9 +34,9 @@ build-job:       # This job runs in the build stage, which runs first.
     - docker:19.03.12-dind
   before_script:
     - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
     - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
   script:
     - git clone git@github.com:sth144/trello-groomer.git
@@ -45,8 +45,10 @@ build-job:       # This job runs in the build stage, which runs first.
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
+  tags:
+    - k8s
   script:
-    - echo "Running unit tests... This will take about 60 seconds."
+    - echo "Running unit tests on k8s... This will take about 60 seconds."
     - sleep 60
     - echo "Code coverage is 90%"
 

@@ -38,6 +38,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
   script:
     - git clone git@github.com:sth144/trello-groomer.git

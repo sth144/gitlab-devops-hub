@@ -1,0 +1,12 @@
+stages:
+  - run_tasks
+
+variables:
+  $REPO: $REPO
+
+run_tasks:
+  stage: run_tasks
+  script:
+    - echo "Running Task 2"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $REPO == "trello-groomer"

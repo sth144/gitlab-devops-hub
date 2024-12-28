@@ -2,7 +2,7 @@ stages:
   - run_tasks
 
 variables:
-  $REPO: $REPO
+  REPO: $REPO
 
 run_tasks:
   stage: run_tasks

@@ -17,7 +17,9 @@
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
 include:
-  - local: "workflow/trello-groomer-ci.yml"
+  - project: "sthinds1/gitlab-devops-hub"
+    ref: "main"
+    file: "workflow/trello-groomer-ci.yml"
 
 variables:
   ARGUMENT: ""

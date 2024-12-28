@@ -20,8 +20,8 @@ include:
   - project: "sthinds1/gitlab-devops-hub"
     ref: "main"
     file:
-      - "workflow/*.yml"
-
+      - "workflow/trello-groomer-ci.yml"
+      - "workflow/tts-ui-ci.yml"
 variables:
   ARGUMENT: ""
 # stages:

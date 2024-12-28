@@ -19,7 +19,8 @@
 include:
   - project: "sthinds1/gitlab-devops-hub"
     ref: "main"
-    file: "workflow/trello-groomer-ci.yml"
+    file:
+      - "workflow/*.yml"
 
 variables:
   ARGUMENT: ""

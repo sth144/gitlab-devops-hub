@@ -1,4 +1,4 @@
-trello_groomer_ci:
+build:
   stage: build
   variables:
     REPO: $REPO

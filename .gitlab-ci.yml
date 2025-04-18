@@ -15,7 +15,9 @@
 # https://docs.gitlab.com/ee/development/cicd/templates.html
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
-
+stages:
+  - build
+  - test
 include:
   - project: "sthinds/gitlab-devops-hub"
     ref: "main"

@@ -1,4 +1,4 @@
-tts_ui_build:
+tts_ui_ci:
   stage: build
   variables:
     REPO: $REPO

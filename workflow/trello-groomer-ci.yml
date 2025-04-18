@@ -1,5 +1,5 @@
 trello_groomer_ci:
-  stage: trello_groomer
+  stage: build
   variables:
     REPO: $REPO
   script:

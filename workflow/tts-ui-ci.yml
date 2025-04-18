@@ -1,12 +1,8 @@
-stages:
-  - run_tasks
-
-variables:
-  REPO: $REPO
-
-run_tasks:
-  stage: run_tasks
+tts_ui:
+  stage: tts_ui
+  variables:
+    REPO: $REPO
   script:
-    - echo "Running Task TTS_UI"
+    - echo "TTS_UI Build!!!"
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "tts-ui"

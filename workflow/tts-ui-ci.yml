@@ -1,5 +1,5 @@
 tts_ui:
-  stage: tts_ui
+  stage: build
   variables:
     REPO: $REPO
   script:

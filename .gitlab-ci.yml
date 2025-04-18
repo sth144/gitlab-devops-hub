@@ -17,7 +17,7 @@
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
 include:
-  - project: "sthinds1/gitlab-devops-hub"
+  - project: "sthinds/gitlab-devops-hub"
     ref: "main"
     file:
       - "workflow/trello-groomer-ci.yml"

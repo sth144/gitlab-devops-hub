@@ -19,6 +19,7 @@ stages:
   - preflight
   - build
   - test
+  - deploy
 include:
   - project: "sthinds/gitlab-devops-hub"
     ref: "main"
@@ -39,4 +40,3 @@ k8s_healthcheck:
     - k8s
   script:
     - echo "Gitlab CI Kubernetes Runner active"
-    

@@ -27,5 +27,7 @@
 # variables:
 #   ARGUMENT: ""
 hello_world:
+  tags:
+    - docker
   script:
     - echo "Hello, GitLab CI!"

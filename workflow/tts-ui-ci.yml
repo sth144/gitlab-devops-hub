@@ -6,3 +6,8 @@ tts_ui_ci:
     - echo "TTS_UI Build!!!"
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "tts-ui"
+
+tts_ui_ci_loaded:
+  stage: build
+  script:
+    - echo "TTS_UI CI configuration loaded"

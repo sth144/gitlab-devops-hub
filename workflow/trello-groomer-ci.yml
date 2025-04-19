@@ -4,7 +4,8 @@ trello_groomer_ci:
     - docker:dind
   stage: build
   tags:
-    - k8s
+    # - k8s
+    - docker
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "" # Disable TLS for Docker-in-Docker

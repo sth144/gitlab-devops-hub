@@ -1,5 +1,7 @@
 trello_groomer_ci:
   stage: build
+  tags:
+    - k8s
   variables:
     REPO: $REPO
   script:
@@ -9,5 +11,7 @@ trello_groomer_ci:
 
 trello_groomer_ci_loaded:
   stage: build
+  tags:
+    - k8s
   script:
     - echo "Loaded Trello Groomer CI configuration"

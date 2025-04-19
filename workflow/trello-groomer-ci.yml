@@ -1,4 +1,4 @@
-build:
+trello_groomer_ci:
   stage: build
   variables:
     REPO: $REPO
@@ -6,3 +6,8 @@ build:
     - echo "Trello Groomer Build!!!"
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "trello-groomer"
+
+trello_groomer_ci_loaded:
+  stage: build
+  script:
+    - echo "Loaded Trello Groomer CI configuration"

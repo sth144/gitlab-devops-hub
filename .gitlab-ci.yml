@@ -39,5 +39,4 @@ k8s_healthcheck:
     - k8s
   script:
     - echo "Gitlab CI Kubernetes Runner active"
-    - ip addr
     

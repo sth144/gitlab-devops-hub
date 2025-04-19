@@ -1,5 +1,7 @@
 tts_ui_ci:
   stage: build
+  tags:
+    - docker
   variables:
     REPO: $REPO
   script:
@@ -9,5 +11,7 @@ tts_ui_ci:
 
 tts_ui_ci_loaded:
   stage: build
+  tags:
+    - docker
   script:
     - echo "TTS_UI CI configuration loaded"

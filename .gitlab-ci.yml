@@ -15,19 +15,20 @@
 # https://docs.gitlab.com/ee/development/cicd/templates.html
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
-# stages:
-#   - build
-#   - test
-# include:
-#   - project: "sthinds/gitlab-devops-hub"
-#     ref: "main"
-#     file:
-#       - "workflow/trello-groomer-ci.yml"
-#       - "workflow/tts-ui-ci.yml"
-# variables:
-#   ARGUMENT: ""
-hello_world:
+stages:
+  - build
+  - test
+devops:
+  stage: build
   tags:
     - docker
   script:
     - echo "Hello, GitLab CI!"
+  include:
+    - project: "sthinds/gitlab-devops-hub"
+      ref: "main"
+      file:
+        - "workflow/trello-groomer-ci.yml"
+        - "workflow/tts-ui-ci.yml"
+  variables:
+    ARGUMENT: ""

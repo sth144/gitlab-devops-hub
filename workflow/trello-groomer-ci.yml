@@ -1,17 +1,15 @@
 trello_groomer_ci:
   image: docker:latest
-  services:
-    - docker:dind
   stage: build
   tags:
-    # - k8s
+    - local
     - docker
   variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: "" # Disable TLS for Docker-in-Docker
     REPO: $REPO
     BRANCH: $BRANCH
+    # DOCKER_HOST: tcp://docker:2375
+    # DOCKER_DRIVER: overlay2
+    # DOCKER_TLS_CERTDIR: "" # Disable TLS for Docker-in-Docker
   before_script:
     - apk add --no-cache git
   script:

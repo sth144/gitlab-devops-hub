@@ -16,6 +16,7 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 stages:
+  - preflight
   - build
   - test
 include:
@@ -24,11 +25,18 @@ include:
     file:
       - "workflow/trello-groomer-ci.yml"
       - "workflow/tts-ui-ci.yml"
-devops:
-  stage: build
+devops_healthcheck:
+  stage: preflight
   tags:
     - docker
   script:
     - echo "Hello, GitLab CI!"
   variables:
     ARGUMENT: ""
+k8s_healthcheck:
+  stage: preflight
+  tags:
+    - k8s
+  script:
+    - echo "Gitlab CI Kubernetes Runner active"
+    

@@ -35,6 +35,9 @@ trello_groomer_test:
   variables:
     REPO: $REPO
     BRANCH: $BRANCH
+  artifacts:
+    paths:
+      - build-image.tar
   before_script:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:

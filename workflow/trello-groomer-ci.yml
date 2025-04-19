@@ -1,12 +1,13 @@
 trello_groomer_ci:
-  image: docker:20.10.24-dind
+  image: docker:latest
   services:
-    - docker:20.10.24-dind
+    - docker:dind
   stage: build
   tags:
     - k8s
   variables:
     DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: "" # Disable TLS for Docker-in-Docker
     REPO: $REPO
     BRANCH: $BRANCH
   before_script:

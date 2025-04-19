@@ -17,12 +17,13 @@ trello_groomer_build:
     - git clone --depth 1 --branch "$BRANCH" "https://github.com/sth144/$REPO.git"
     - cd "$REPO"
     - docker build --target build -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" .
-    - docker save $DOCKER_USERNAME/$REPO:$BRANCH-build -o build-image.tar
+    - docker save $DOCKER_USERNAME/$REPO:$BRANCH-build -o build_cache/build-image.tar
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push "$DOCKER_USERNAME/$REPO:$BRANCH"
-  artifacts:
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build-image.tar
+      - build_cache/
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "trello-groomer"
 
@@ -37,13 +38,14 @@ trello_groomer_test:
     BRANCH: $BRANCH
   dependencies:
     - trello_groomer_build
-  artifacts:
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build-image.tar
+      - build_cache/
   before_script:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
-    - docker load -i build-image.tar
+    - docker load -i build_cache/build-image.tar
     - docker build --target test -t $REPO:test .
     - docker run --rm $REPO:test
   rules:

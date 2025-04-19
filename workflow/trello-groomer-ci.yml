@@ -16,6 +16,7 @@ trello_groomer_ci:
   script:
     - git clone --depth 1 --branch "$BRANCH" "https://github.com/sth144/$REPO.git"
     - cd "$REPO"
+    - unset DOCKER_HOST
     - docker build -t "$DOCKER_USERNAME/$REPO:$BRANCH" .
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push "$DOCKER_USERNAME/$REPO:$BRANCH"

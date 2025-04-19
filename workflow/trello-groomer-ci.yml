@@ -17,7 +17,7 @@ trello_groomer_build:
     - git clone --depth 1 --branch "$BRANCH" "https://github.com/sth144/$REPO.git"
     - cd "$REPO"
     - docker build --target build -t "$DOCKER_USERNAME/$REPO:$BRANCH" .
-    - docker save $REPO:build -o build-image.tar
+    - docker save $DOCKER_USERNAME/$REPO:$BRANCH:build -o build-image.tar
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push "$DOCKER_USERNAME/$REPO:$BRANCH"
   artifacts:

@@ -38,7 +38,7 @@ trello_groomer_test:
   before_script:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
-    - docker save $REPO:build -o build-image.tar
+    - docker load -i build-image.tar
     - docker build --target test -t $REPO:test .
     - docker run --rm $REPO:test
   rules:

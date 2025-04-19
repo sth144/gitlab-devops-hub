@@ -10,7 +10,7 @@ tts_ui_ci:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "tts-ui"
 
 tts_ui_ci_loaded:
-  stage: build
+  stage: preflight
   tags:
     - docker
   script:

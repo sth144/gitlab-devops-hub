@@ -4,13 +4,25 @@ trello_groomer_ci:
     - k8s
   variables:
     REPO: $REPO
+    BRANCH: $BRANCH
   script:
-    - echo "Trello Groomer Build!!!"
+    - echo "Cloning $REPO at branch $BRANCH"
+    - git clone --depth 1 --branch "$BRANCH" "https://github.com/sth144/$REPO.git"
+    - cd "$REPO"
+
+    # Build Docker image
+    - docker build -t "$DOCKER_USERNAME/$REPO:$BRANCH" .
+
+    # Login to Docker Hub
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+    # Push image
+    - docker push "$DOCKER_USERNAME/$REPO:$BRANCH"
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "trello-groomer"
 
 trello_groomer_ci_loaded:
-  stage: build
+  stage: preflight
   tags:
     - k8s
   script:

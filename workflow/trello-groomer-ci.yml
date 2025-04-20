@@ -62,15 +62,14 @@ trello_groomer_deploy:
     - trello_groomer_build
     - trello_groomer_test
   script:
-    - kubectl config set-cluster my-cluster --server=$K8S_API_SERVER --insecure-skip-tls-verify=true
+    - kubectl config set-cluster picocluster --server=$K8S_API_SERVER --insecure-skip-tls-verify=true
     - kubectl config set-credentials gitlab --token=$K8S_TOKEN
-    - kubectl config set-context default --cluster=my-cluster --user=gitlab --namespace=default
+    - kubectl config set-context default --cluster=picocluster --user=gitlab --namespace=default
     - kubectl config use-context default
 
     # Force a redeploy with annotation (Option 1)
-    - kubectl patch deployment trello-groomer-todo \
-      --type=merge \
-      --patch "$(printf '{"spec":{"template":{"metadata":{"annotations":{"ci-refresh":"%s"}}}}}' "$(date +%s)")"
+    - export NOW=$(date +%s)
+    - kubectl patch deployment trello-groomer-todo --type=merge --patch "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"ci-refresh\":\"$NOW\"}}}}}"
 
     # OR update image (Option 2)
     # - kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$DOCKER_IMAGE:$CI_COMMIT_REF_NAME

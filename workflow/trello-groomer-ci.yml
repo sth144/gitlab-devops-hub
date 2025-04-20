@@ -18,14 +18,13 @@ trello_groomer_build:
     - mkdir -p build_cache
     - cd "$REPO"
     - docker build --target build -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" .
-    - cd ..
-    - docker save $DOCKER_USERNAME/$REPO:$BRANCH-build -o build_cache/build-image.tar
+    - docker save $DOCKER_USERNAME/$REPO:$BRANCH-build -o ./build-image.tar
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push "$DOCKER_USERNAME/$REPO:$BRANCH"
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build_cache/
+      - trello-groomer/
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "trello-groomer"
 
@@ -43,10 +42,11 @@ trello_groomer_test:
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build_cache/
+      - trello-groomer/
   before_script:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
+    - cd trello-groomer
     - docker load -i build_cache/build-image.tar
     - docker build --target test -t $REPO:test .
     - docker run --rm $REPO:test

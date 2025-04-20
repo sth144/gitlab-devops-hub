@@ -16,6 +16,7 @@ trello_groomer_build:
   script:
     - rm -rf ./source-code
     - git clone --depth 1 --branch "$BRANCH" "https://github.com/sth144/$REPO.git" source-code
+    - cd ./source-code
     - docker build --target build -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" .
     - docker save $DOCKER_USERNAME/$REPO:$BRANCH-build -o ./build-image.tar
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
@@ -45,7 +46,7 @@ trello_groomer_test:
   before_script:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
-    - cd source-code
+    - cd ./source-code
     - docker load -i ./build-image.tar
     - docker build --target test -t $REPO:test .
     - docker run --rm $REPO:test

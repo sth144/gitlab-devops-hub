@@ -19,6 +19,7 @@ trello_groomer_build:
     - cd ./source-code
     - docker build --target build -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" .
     - docker save $DOCKER_USERNAME/$REPO:$BRANCH-build -o ./build-image.
+    - ls
     - docker build --target deploy -t "$DOCKER_USERNAME/$REPO:$BRANCH" .
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push "$DOCKER_USERNAME/$REPO:$BRANCH"
@@ -48,6 +49,7 @@ trello_groomer_test:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
     - cd ./source-code
+    - ls
     - docker load -i ./build-image.tar
     - docker build --target test -t $REPO:test .
     - docker run --rm $REPO:test

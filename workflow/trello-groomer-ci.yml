@@ -14,9 +14,8 @@ trello_groomer_build:
     - apk add --no-cache git
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
-    - mkdir -p source-code
+    - rm -rf ./source-code
     - git clone --depth 1 --branch "$BRANCH" "https://github.com/sth144/$REPO.git" source-code
-    - cd source-code
     - docker build --target build -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" .
     - docker save $DOCKER_USERNAME/$REPO:$BRANCH-build -o ./build-image.tar
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin

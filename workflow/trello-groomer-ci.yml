@@ -68,8 +68,9 @@ trello_groomer_deploy:
     - kubectl config use-context default
 
     # Force a redeploy with annotation (Option 1)
-    - kubectl patch deployment "trello-groomer-todo" \
-      -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"ci-refresh\":\"$(date +%s)\"}}}}}"
+    - kubectl patch deployment trello-groomer-todo \
+      --type=merge \
+      --patch "$(printf '{"spec":{"template":{"metadata":{"annotations":{"ci-refresh":"%s"}}}}}' "$(date +%s)")"
 
     # OR update image (Option 2)
     # - kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$DOCKER_IMAGE:$CI_COMMIT_REF_NAME

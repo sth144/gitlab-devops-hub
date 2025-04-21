@@ -94,6 +94,9 @@ trello_groomer_deploy:
     - kubectl config set-context default --cluster=picocluster --user=gitlab --namespace=default
     - kubectl config use-context default
 
+    - kubectl get nodes
+    - kubectl get pods
+
     # Force a redeploy with annotation (Option 1)
     - export NOW=$(date +%s)
     - kubectl patch deployment trello-groomer-todo --type=merge --patch "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"ci-refresh\":\"$NOW\"}}}}}"

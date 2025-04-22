@@ -89,9 +89,9 @@ trello_groomer_deploy:
     - export KUBECONFIG=$PWD/kubeconfig
     - cat ./kubeconfig
   script:
-    - kubectl config set-cluster picocluster --server=$K8S_API_SERVER --insecure-skip-tls-verify=true
-    - kubectl config set-credentials gitlab --token=$K8S_TOKEN
-    - kubectl config set-context default --cluster=picocluster --user=gitlab --namespace=default
+    - kubectl config set-cluster kubernetes --server=$K8S_API_SERVER --insecure-skip-tls-verify=true
+    - kubectl config set-credentials kubernetes-admin --token=$K8S_TOKEN
+    - kubectl config set-context default --cluster=kubernetes --user=kubernetes-admin --namespace=default
     - kubectl config use-context default
 
     - kubectl get nodes

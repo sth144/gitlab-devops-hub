@@ -86,14 +86,15 @@ trello_groomer_deploy:
         - name: kubernetes-admin
           user:
             client-certificate-data: $K8S_CLIENT_CERT
+            client-key-data: $K8S_CLIENT_KEY
       EOF
     - export KUBECONFIG=$PWD/kubeconfig
     - cat ./kubeconfig
   script:
-    - kubectl config set-cluster kubernetes --server=$K8S_API_SERVER --insecure-skip-tls-verify=true
-    - kubectl config set-credentials deployer --token=$K8S_TOKEN
-    - kubectl config set-context default --cluster=kubernetes --user=deployer --namespace=default
-    - kubectl config use-context default
+    # - kubectl config set-cluster kubernetes --server=$K8S_API_SERVER --insecure-skip-tls-verify=true
+    # - kubectl config set-credentials deployer --token=$K8S_TOKEN
+    # - kubectl config set-context default --cluster=kubernetes --user=deployer --namespace=default
+    # - kubectl config use-context default
 
     - kubectl get nodes
     - kubectl get pods

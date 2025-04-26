@@ -20,7 +20,7 @@ trello_groomer_build:
     - docker buildx create --use
     - |
       docker buildx build \
-        --platform linux/amd64,linux/arm64,linux/arm/v7 \
+        --platform linux/arm/v7 \
         --target build -t \
         "$DOCKER_USERNAME/$REPO:$BRANCH-build" \
         . \
@@ -29,7 +29,7 @@ trello_groomer_build:
     - ls
     - |
       docker buildx build \
-        --platform linux/amd64,linux/arm64,linux/arm/v7 \
+        --platform linux/arm/v7 \
         --target deploy \
         -t "$DOCKER_USERNAME/$REPO:$BRANCH \
         -t "$DOCKER_USERNAME/$REPO:latest" \

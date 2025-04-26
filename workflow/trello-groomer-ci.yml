@@ -20,9 +20,10 @@ trello_groomer_build:
     - docker build --target build -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" .
     - docker save $DOCKER_USERNAME/$REPO:$BRANCH-build -o ./build-image.tar
     - ls
-    - docker build --target deploy -t "$DOCKER_USERNAME/$REPO:$BRANCH" .
+    - docker build --target deploy -t "$DOCKER_USERNAME/$REPO:$BRANCH" -t "$DOCKER_USERNAME/$REPO:latest" .
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push "$DOCKER_USERNAME/$REPO:$BRANCH"
+    - docker push "$DOCKER_USERNAME/$REPO:latest"
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:

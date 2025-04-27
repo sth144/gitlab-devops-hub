@@ -7,34 +7,30 @@ trello_groomer_build:
   variables:
     REPO: $REPO
     BRANCH: $BRANCH
-    # DOCKER_HOST: tcp://docker:2375
-    # DOCKER_DRIVER: overlay2
-    # DOCKER_TLS_CERTDIR: "" # Disable TLS for Docker-in-Docker
+    PLATFORMS: linux/amd64,linux/arm/v7
   before_script:
     - apk add --no-cache git
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    - docker buildx create --use
   script:
     - rm -rf ./source-code
     - git clone --depth 1 --branch "$BRANCH" "https://github.com/sth144/$REPO.git" source-code
     - cd ./source-code
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - docker buildx create --use
+
+    # Build and push base/build/deploy with cache
     - |
       docker buildx build \
-        --platform linux/arm/v7 \
+        --platform $PLATFORMS \
         --target build \
         --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache \
         --cache-to=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache,mode=max \
         -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" \
         . \
         --push
-    # buildx doesn't store images...
-    - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-build"
-    - docker save $DOCKER_USERNAME/$REPO:$BRANCH-build -o ./build-image.tar
-    - ls
+
     - |
       docker buildx build \
-        --platform linux/arm/v7 \
+        --platform $PLATFORMS \
         --target deploy \
         --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache \
         --cache-to=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache,mode=max \
@@ -51,8 +47,8 @@ trello_groomer_build:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "trello-groomer"
 
 trello_groomer_test:
-  stage: test
   image: docker:latest
+  stage: test
   tags:
     - local
     - docker
@@ -69,9 +65,20 @@ trello_groomer_test:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
     - cd ./source-code
-    - ls
-    - docker load -i ./build-image.tar
-    - docker build --target test -t $REPO:test .
+    - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-build"
+
+    # Now build test target using pulled build image as cache
+    - |
+      docker buildx create --use
+      docker buildx build \
+        --platform linux/amd64 \   # Use host platform here for running tests in CI
+        --target test \
+        --build-from=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache \
+        --load \
+        -t $REPO:test \
+        .
+
+    # Now run tests
     - docker run --rm $REPO:test
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "trello-groomer"

@@ -17,6 +17,7 @@ trello_groomer_build:
     - rm -rf ./source-code
     - git clone --depth 1 --branch "$BRANCH" "https://github.com/sth144/$REPO.git" source-code
     - cd ./source-code
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker buildx create --use
     - |
       docker buildx build \
@@ -37,9 +38,6 @@ trello_groomer_build:
         -t "$DOCKER_USERNAME/$REPO:latest" \
         . \
         --push
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - docker push "$DOCKER_USERNAME/$REPO:$BRANCH"
-    - docker push "$DOCKER_USERNAME/$REPO:latest"
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:

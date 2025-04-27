@@ -23,6 +23,8 @@ trello_groomer_build:
       docker buildx build \
         --platform linux/arm/v7 \
         --target build \
+        --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache \
+        --cache-to=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache,mode=max \
         -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" \
         . \
         --push
@@ -34,10 +36,13 @@ trello_groomer_build:
       docker buildx build \
         --platform linux/arm/v7 \
         --target deploy \
-        -t "$DOCKER_USERNAME/$REPO:$BRANCH \
+        --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache \
+        --cache-to=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache,mode=max \
+        -t "$DOCKER_USERNAME/$REPO:$BRANCH" \
         -t "$DOCKER_USERNAME/$REPO:latest" \
         . \
         --push
+
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:

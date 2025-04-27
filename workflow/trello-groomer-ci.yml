@@ -21,10 +21,12 @@ trello_groomer_build:
     - |
       docker buildx build \
         --platform linux/arm/v7 \
-        --target build -t \
-        "$DOCKER_USERNAME/$REPO:$BRANCH-build" \
+        --target build \
+        -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" \
         . \
         --push
+    # buildx doesn't store images...
+    - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-build"
     - docker save $DOCKER_USERNAME/$REPO:$BRANCH-build -o ./build-image.tar
     - ls
     - |

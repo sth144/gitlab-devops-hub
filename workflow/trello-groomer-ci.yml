@@ -66,10 +66,10 @@ trello_groomer_test:
   script:
     - cd ./source-code
     - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-build"
+    - docker buildx create --use
 
     # Now build test target using pulled build image as cache
     - |
-      docker buildx create --use
       docker buildx build \
         --platform linux/amd64 \   # Use host platform here for running tests in CI
         --target test \

@@ -68,13 +68,14 @@ trello_groomer_test:
     - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-build"
     - docker buildx create --use
     # Now build test target using pulled build image as cache
+    # Use host platform here for running tests in CI
     - |
       docker buildx build \
-        --platform linux/amd64 \   # Use host platform here for running tests in CI
+        --platform linux/amd64 \
         --target test \
         --build-from=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache \
         --load \
-        -t $REPO:test . \
+        -t $REPO:test .
 
     # Now run tests
     - docker run --rm $REPO:test

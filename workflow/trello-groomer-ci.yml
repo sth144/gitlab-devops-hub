@@ -65,7 +65,7 @@ trello_groomer_test:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
     - cd ./source-code
-    - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-buildcache"
+    - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-build"
     - docker buildx create --use
     # Now build test target using pulled build image as cache
     # Use host platform here for running tests in CI

@@ -22,8 +22,8 @@ trello_groomer_build:
       docker buildx build \
         --platform $PLATFORMS \
         --target build \
-        --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache \
-        --cache-to=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache,mode=max \
+        --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:$BRANCH-buildcache \
+        --cache-to=type=registry,ref=$DOCKER_USERNAME/$REPO:$BRANCH-buildcache,mode=max \
         -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" \
         . \
         --push
@@ -32,8 +32,8 @@ trello_groomer_build:
       docker buildx build \
         --platform $PLATFORMS \
         --target deploy \
-        --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache \
-        --cache-to=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache,mode=max \
+        --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:$BRANCH-buildcache \
+        --cache-to=type=registry,ref=$DOCKER_USERNAME/$REPO:$BRANCH-buildcache,mode=max \
         -t "$DOCKER_USERNAME/$REPO:$BRANCH" \
         -t "$DOCKER_USERNAME/$REPO:latest" \
         . \
@@ -65,7 +65,7 @@ trello_groomer_test:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
     - cd ./source-code
-    - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-build"
+    - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-buildcache"
     - docker buildx create --use
     # Now build test target using pulled build image as cache
     # Use host platform here for running tests in CI
@@ -73,7 +73,7 @@ trello_groomer_test:
       docker buildx build \
         --platform linux/amd64 \
         --target test \
-        --build-from=type=registry,ref=$DOCKER_USERNAME/$REPO:buildcache \
+        --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:$BRANCH-buildcache \
         --load \
         -t $REPO:test .
 

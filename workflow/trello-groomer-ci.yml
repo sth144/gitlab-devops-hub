@@ -38,7 +38,8 @@ trello_groomer_build:
         -t "$DOCKER_USERNAME/$REPO:latest" \
         . \
         --push
-
+  after_script:
+    - docker buildx rm || true
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
@@ -63,10 +64,10 @@ trello_groomer_test:
       - source-code/
   before_script:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    - docker buildx create --use
   script:
     - cd ./source-code
     - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-build"
-    - docker buildx create --use
     # Now build test target using pulled build image as cache
     # Use host platform here for running tests in CI
     - |
@@ -77,8 +78,9 @@ trello_groomer_test:
         --load \
         -t $REPO:test .
 
-    # Now run tests
     - docker run --rm $REPO:test
+  after_script:
+    - docker buildx rm || true
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "trello-groomer"
 
@@ -125,11 +127,11 @@ trello_groomer_deploy:
     - kubectl get nodes
     - kubectl get pods
 
-    # Force a redeploy with annotation (Option 1)
+    # Option 1: Force a redeploy with annotation
     - export NOW=$(date +%s)
     - kubectl patch deployment trello-groomer-todo --type=merge --patch "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"ci-refresh\":\"$NOW\"}}}}}"
 
-    # OR update image (Option 2)
+    # Option 2: Update image (uncomment if preferred)
     # - kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$DOCKER_IMAGE:$CI_COMMIT_REF_NAME
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $REPO == "trello-groomer"

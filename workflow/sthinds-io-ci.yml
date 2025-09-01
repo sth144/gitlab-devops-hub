@@ -1,0 +1,145 @@
+sthinds_io_build:
+  image: docker:latest
+  stage: build
+  tags:
+    - local
+    - docker
+  variables:
+    REPO: $REPO
+    BRANCH: $BRANCH
+    PLATFORMS: linux/amd64,linux/arm/v7
+  before_script:
+    - apk add --no-cache git
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    - docker buildx create --use
+  script:
+    - rm -rf ./source-code
+    - git clone --depth 1 --branch "$BRANCH" "https://github.com/sth144/$REPO.git" source-code
+    - cd ./source-code
+
+    # Build and push base/build/deploy with cache
+    - |
+      docker buildx build \
+        --platform $PLATFORMS \
+        --target build \
+        --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:$BRANCH-buildcache \
+        --cache-to=type=registry,ref=$DOCKER_USERNAME/$REPO:$BRANCH-buildcache,mode=max \
+        -t "$DOCKER_USERNAME/$REPO:$BRANCH-build" \
+        . \
+        --push
+
+    - |
+      docker buildx build \
+        --platform $PLATFORMS \
+        --target deploy \
+        --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:$BRANCH-buildcache \
+        --cache-to=type=registry,ref=$DOCKER_USERNAME/$REPO:$BRANCH-buildcache,mode=max \
+        -t "$DOCKER_USERNAME/$REPO:$BRANCH" \
+        -t "$DOCKER_USERNAME/$REPO:latest" \
+        . \
+        --push
+  after_script:
+    - docker buildx rm || true
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - source-code/
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $REPO == "sthinds.io"
+
+sthinds_io_test:
+  image: docker:latest
+  stage: test
+  tags:
+    - local
+    - docker
+  variables:
+    REPO: $REPO
+    BRANCH: $BRANCH
+  dependencies:
+    - sthinds_io_build
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - source-code/
+  before_script:
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    - docker buildx create --use
+  script:
+    - cd ./source-code
+    - docker pull "$DOCKER_USERNAME/$REPO:$BRANCH-build"
+    # Now build test target using pulled build image as cache
+    # Use host platform here for running tests in CI
+    - |
+      docker buildx build \
+        --platform linux/amd64 \
+        --target test \
+        --cache-from=type=registry,ref=$DOCKER_USERNAME/$REPO:$BRANCH-buildcache \
+        --load \
+        -t $REPO:test .
+
+    - docker run --rm $REPO:test
+  after_script:
+    - docker buildx rm || true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $REPO == "sthinds.io"
+
+sthinds_io_deploy:
+  image: bitnami/kubectl:latest
+  stage: deploy
+  tags:
+    - k8s
+  dependencies:
+    - sthinds_io_build
+    - sthinds_io_test
+  before_script:
+    - echo "$KUBE_CA_PEM" | base64 -d > ca.crt
+    - |
+      cat <<EOF > kubeconfig
+      apiVersion: v1
+      clusters:
+        - cluster:
+            certificate-authority-data: $K8S_CA_PEM
+            server: https://192.168.1.240:6443
+          name: kubernetes
+      contexts:
+        - context:
+            cluster: kubernetes
+            user: kubernetes-admin
+          name: kubernetes-admin@kubernetes
+      current-context: kubernetes-admin@kubernetes
+      kind: Config
+      preferences: {}
+      users:
+        - name: kubernetes-admin
+          user:
+            client-certificate-data: $K8S_CLIENT_CERT
+            client-key-data: $K8S_CLIENT_KEY
+      EOF
+    - export KUBECONFIG=$PWD/kubeconfig
+    - cat ./kubeconfig
+  script:
+    # - kubectl config set-cluster kubernetes --server=$K8S_API_SERVER --insecure-skip-tls-verify=true
+    # - kubectl config set-credentials deployer --token=$K8S_TOKEN
+    # - kubectl config set-context default --cluster=kubernetes --user=deployer --namespace=default
+    # - kubectl config use-context default
+
+    - kubectl get nodes
+    - kubectl get pods
+
+    # Option 1: Force a redeploy with annotation
+    - export NOW=$(date +%s)
+    - kubectl patch deployment sthinds.io-todo --type=merge --patch "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"ci-refresh\":\"$NOW\"}}}}}"
+
+    # Option 2: Update image (uncomment if preferred)
+    # - kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$DOCKER_IMAGE:$CI_COMMIT_REF_NAME
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $REPO == "sthinds.io"
+
+sthinds_io_ci_loaded:
+  stage: preflight
+  tags:
+    - k8s
+  script:
+    - echo "Loaded sthinds.io CI configuration"
+# TODO: Heroku deploy

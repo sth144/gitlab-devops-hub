@@ -26,6 +26,7 @@ include:
     file:
       - "workflow/trello-groomer-ci.yml"
       - "workflow/tts-ui-ci.yml"
+      - "workflow/sthinds-io-ci.yml"
 devops_healthcheck:
   stage: preflight
   tags:
